@@ -4,6 +4,7 @@ import glob
 import math
 import os
 import random
+import time
 from copy import copy
 from pathlib import Path
 
@@ -54,18 +55,33 @@ def butter_lowpass_filtfilt(data, cutoff=1500, fs=50000, order=5):
     return filtfilt(b, a, data)  # forward-backward filter
 
 
-def plot_one_box(x, img, color=None, label=None, line_thickness=3):
+def plot_one_box(x, img, cls, color=None, label=None, line_thickness=3):
     # Plots one bounding box on image img
+    flag = 0
     tl = line_thickness or round(0.002 * (img.shape[0] + img.shape[1]) / 2) + 1  # line/font thickness
     color = color or [random.randint(0, 255) for _ in range(3)]
     c1, c2 = (int(x[0]), int(x[1])), (int(x[2]), int(x[3]))
-    cv2.rectangle(img, c1, c2, color, thickness=tl, lineType=cv2.LINE_AA)
-    if label:
-        tf = max(tl - 1, 1)  # font thickness
-        t_size = cv2.getTextSize(label, 0, fontScale=tl / 3, thickness=tf)[0]
-        c2 = c1[0] + t_size[0], c1[1] - t_size[1] - 3
-        cv2.rectangle(img, c1, c2, color, -1, cv2.LINE_AA)  # filled
-        cv2.putText(img, label, (c1[0], c1[1] - 2), 0, tl / 3, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
+    # cv2.rectangle(img, c1, c2, color, thickness=tl, lineType=cv2.LINE_AA)
+    
+    if cls == 0: # licene_plate
+    # if cls == 3: # motorcycle
+        # print(c1[0], '!!!!!!!!!!', c2[0])
+        # print(c1[1], '!!!!!!!!!!', c2[1])
+        # cv2.imshow('img0', img)
+        # cv2.waitKey(0)
+        crop_img = img[int(c1[1]):int(c2[1]), int(c1[0]):int(c2[0])]
+        # cv2.imshow('img', crop_img)
+        # cv2.waitKey(0)
+        flag = 1
+        return crop_img, flag
+    # if label:
+    #     tf = max(tl - 1, 1)  # font thickness
+    #     t_size = cv2.getTextSize(label, 0, fontScale=tl / 3, thickness=tf)[0]
+    #     c2 = c1[0] + t_size[0], c1[1] - t_size[1] - 3
+    #     cv2.rectangle(img, c1, c2, color, -1, cv2.LINE_AA)  # filled
+    #     cv2.putText(img, label, (c1[0], c1[1] - 2), 0, tl / 3, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
+    return img, flag
+            
 
 
 def plot_one_box_PIL(box, img, color=None, label=None, line_thickness=None):
